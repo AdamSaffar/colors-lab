@@ -1,0 +1,47 @@
+@startuml
+title COLORS - Use Case Diagram
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam dpi 160
+skinparam ArrowColor #333333
+skinparam ActorBorderColor #333333
+skinparam ActorFontColor #222222
+skinparam UsecaseBackgroundColor #F2F6FC
+skinparam UsecaseBorderColor #333333
+skinparam RectangleBorderColor #333333
+skinparam LegendBackgroundColor white
+skinparam LegendBorderColor #AAAAAA
+
+actor User
+
+rectangle "COLORS Web Application" {
+  usecase "Log In" as Login
+  usecase "Add Color" as Add
+  usecase "Search Colors" as Search
+  usecase "Log Out" as Logout
+}
+
+User -- Login
+User -- Add
+User -- Search
+User -- Logout
+
+legend bottom left
+  Precondition for Add Color, Search Colors, and Log Out is that the user must be logged in.
+  Add Color and Search Colors are associated with the current user ID.
+endlegend
+
+' Source verification:
+' index.html invokes doLogin() in js/code.js, which posts to LAMPAPI/Login.php.
+' color.html invokes addColor(), searchColor(), and doLogout() in js/code.js.
+' LAMPAPI/AddColor.php inserts a color with the supplied userId.
+' LAMPAPI/SearchColors.php filters color names by search text and userId.
+' doLogout() clears the client identity and cookie and returns to index.html.
+' Login is a prerequisite in the normal browser flow, not an included subtask
+' of each add/search request. The PHP endpoints do not reauthenticate the user.
+' No registration, editing, deletion, or separate view-all use case is implemented.
+@enduml

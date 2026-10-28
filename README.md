@@ -33,3 +33,7 @@ After the project has been placed in the Apache web directory and the database h
 The exact URL will depend on your configuration.
 
 The application starts at index.html. After login, the user is redirected to color.html.
+
+## AI Usage
+
+I used OpenAI Codex to help develop and refine the UML diagrams for this assignment. I reviewed the generated work and requested revisions as needed.

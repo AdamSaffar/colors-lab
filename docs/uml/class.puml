@@ -1,0 +1,98 @@
+@startuml
+title COLORS - Class Diagram
+top to bottom direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam dpi 140
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor #F2F6FC
+skinparam ClassBorderColor #333333
+skinparam ArrowColor #333333
+skinparam nodesep 80
+skinparam ranksep 55
+hide circle
+hide empty members
+
+class "js/code.js" as Browser <<module>> {
+  userId : Integer
+  firstName : String
+  lastName : String
+  --
+  +doLogin() : void
+  +doLogout() : void
+  +addColor() : void
+  +searchColor() : void
+  +saveCookie() : void
+  +readCookie() : void
+}
+
+together {
+  class "Login.php" as Login <<endpoint>> {
+    +POST(login, password)
+  }
+  class "AddColor.php" as Add <<endpoint>> {
+    +POST(color, userId)
+  }
+  class "SearchColors.php" as Search <<endpoint>> {
+    +POST(search, userId)
+  }
+}
+
+class User <<entity>> {
+  ID : Integer
+  firstName : String
+  lastName : String
+  Login : String
+  Password : String
+}
+
+class Color <<entity>> {
+  Name : String
+  UserID : Integer
+}
+
+Browser ..> Login : calls
+Browser ..> Add : calls
+Browser ..> Search : calls
+
+Login ..> User : reads
+Add ..> Color : inserts
+Search ..> Color : searches
+
+User "1" -right- "0..*" Color : owns
+
+' Lecture references:
+' Introduction to UML.pdf, slides 5-12 (names and attributes; operations are optional),
+' 18-21 (association and multiplicity), and 42 (class-diagram example).
+' PA-chapter06-Revised.ppt, section 6.4 (object types, attributes, static relationships).
+'
+' Scope: logical class view of the implemented modules and data entities.
+' The module stereotype groups the existing JavaScript variables and functions.
+' Endpoint POST operations describe HTTP request contracts, not PHP function names.
+' User and Color correspond to records in the Users and Colors tables. The source
+' is procedural; this diagram does not assert that these are implemented OO classes.
+' Attributes use logical UML types and the names referenced by the application.
+' Browser constants, the MD5 library internals, PHP JSON helper functions, and
+' transient request/response data are omitted for clarity.
+'
+' Source verification:
+' js/code.js defines userId, firstName, lastName, and all six shown functions.
+' doLogin(), addColor(), and searchColor() call the corresponding PHP endpoints.
+' doLogout() clears browser state and redirects; no logout endpoint is implemented.
+' LAMPAPI/Login.php: SELECT ID,firstName,lastName FROM Users WHERE Login=? AND Password=?
+' LAMPAPI/AddColor.php: INSERT into Colors (UserId,Name) VALUES(?,?)
+' LAMPAPI/SearchColors.php: SELECT Name FROM Colors WHERE Name LIKE ? AND UserID=?
+' SQL uses both UserId and UserID spellings; this model normalizes the attribute to UserID.
+' js/code.js sends an MD5 hash as the login password and uses userId for add/search.
+'
+' A User may have no saved colors or many, and each Color in the normal application
+' data is associated with one User ID. The plain association is labeled "owns" in
+' the domain sense; this does not assert composition or cascade deletion.
+' The repository contains no table-creation schema, so foreign-key enforcement,
+' deletion rules, and additional fields such as Color.ID are not assumed.
+' No Session.id or ColorService class is added because the implementation does not
+' establish those structures. No getters, setters, or entity methods are invented.
+@enduml

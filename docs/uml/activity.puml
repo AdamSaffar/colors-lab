@@ -1,0 +1,81 @@
+@startuml
+title COLORS - Activity Diagram\nUser workflow
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam dpi 140
+skinparam ArrowColor #333333
+skinparam ActivityBackgroundColor #F2F6FC
+skinparam ActivityBorderColor #333333
+skinparam ActivityDiamondBackgroundColor #FFFFFF
+skinparam ActivityDiamondBorderColor #333333
+skinparam ActivityStartColor #333333
+skinparam ActivityEndColor #333333
+skinparam LegendBackgroundColor white
+skinparam LegendBorderColor #AAAAAA
+
+start
+:Open the login page;
+
+repeat
+  :Enter username and password\nand click the login button;
+  :Validate login credentials;
+  backward:Display "User/Password\ncombination incorrect";
+repeat while (Login successful?) is (no) not (yes)
+
+:Open the color page;
+
+:Choose Add Color,\nSearch Colors, or Log Out;
+while (Log Out selected?) is (no)
+  if (Add Color selected?) then (yes)
+    :Enter color name and\nclick Add Color;
+    :Save the color for\nthe logged-in user;
+    :Display "Color has been added";
+  else (Search Colors)
+    :Enter search text and\nclick Search Color;
+    :Search the logged-in user's\nsaved colors;
+    if (Matching colors found?) then (yes)
+      :Display the matching color names;
+    else (no)
+      :Keep the displayed color list unchanged;
+    endif
+  endif
+  :Choose Add Color,\nSearch Colors, or Log Out;
+endwhile (yes)
+
+:Log out;
+:Return to the login page;
+stop
+
+legend bottom left
+  Scope: Normal user workflow with completed requests and an available database.
+  Add Color and Search Colors can be repeated in any order before logging out.
+endlegend
+
+' Notation reference: lecture [5.2] Designing the Modules-1.pdf, slide 26;
+' Introduction to UML.pdf, slides 82-83.
+'
+' Source verification:
+' js/code.js doLogin(): MD5 hash, Login.php request, id < 1 check, cookie, redirect.
+' LAMPAPI/Login.php: Users lookup; failed login response contains id = 0.
+' js/code.js saveCookie(): firstName, lastName, userId, 20-minute expiry.
+' color.html DOMContentLoaded invokes readCookie() before normal user interaction.
+' js/code.js addColor(): sends color/userId; any HTTP 200 displays a success message.
+' LAMPAPI/AddColor.php: INSERT into Colors (UserId,Name).
+' js/code.js searchColor(): sends search/userId; sets retrieval status text before
+' parsing response JSON and reading jsonObject.results.length. css/styles.css sets
+' #colorSearchResult to display: none, so this status text is not visible to the user.
+' LAMPAPI/SearchColors.php: Name LIKE %search% AND UserID = userId; no matches
+' returns error "No Records Found" without a results property.
+' The missing results property causes an exception inside the asynchronous callback;
+' the outer try/catch does not handle that callback exception or update colorList.
+' At this diagram's user-workflow level, the visible result is an unchanged list
+' with no search message. Implementation details belong in source comments only.
+' js/code.js doLogout(): clears browser identity, expires cookie, redirects to index.html.
+'
+' Loops represent repeated user interactions; they are not JavaScript while loops.
+' Search/add do not reauthenticate, refresh the cookie, or automatically load all colors.
+' Registration, edit, and delete operations are absent from the implementation.
+@enduml

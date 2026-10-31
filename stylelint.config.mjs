@@ -1,0 +1,6 @@
+export default {
+  extends: ["stylelint-config-standard"],
+  rules: {
+    "selector-id-pattern": "^[a-z][a-zA-Z0-9-]*$"
+  }
+};

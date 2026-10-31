@@ -1,0 +1,6 @@
+{
+  "tagname-lowercase": true,
+  "attr-lowercase": true,
+  "attr-no-duplication": true,
+  "tag-pair": true
+}

@@ -182,3 +182,7 @@ function searchColor()
 	}
 	
 }
+
+if (typeof module !== "undefined") {
+	module.exports = { addColor };
+}
